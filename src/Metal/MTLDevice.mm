@@ -13,6 +13,8 @@
 #import <Metal/MTLTextureDescriptorInternal.h>
 #import <Metal/MTLTextureInternal.h>
 
+#include <stdlib.h>
+
 MTL_EXTERN const MTLDeviceNotificationName MTLDeviceWasAddedNotification = @"MTLDeviceWasAdded";
 MTL_EXTERN const MTLDeviceNotificationName MTLDeviceRemovalRequestedNotification = @"MTLDeviceRemovalRequested";
 MTL_EXTERN const MTLDeviceNotificationName MTLDeviceWasRemovedNotification = @"MTLDeviceWasRemoved";
@@ -54,8 +56,16 @@ void MTLDeviceDestroyAll(void) {
 
 #endif
 
+static bool metalDisabledByEnvironment(void) {
+	const char* value = getenv("DARLING_METAL_DISABLE");
+	return value && value[0] != '\0' && value[0] != '0';
+}
+
 MTL_EXTERN
 id<MTLDevice> MTLCreateSystemDefaultDevice(void) {
+	if (metalDisabledByEnvironment()) {
+		return nil;
+	}
 #if DARLING_METAL_ENABLED
 	ensureDevices();
 	if (systemDefaultDevice) {
@@ -67,6 +77,9 @@ id<MTLDevice> MTLCreateSystemDefaultDevice(void) {
 
 MTL_EXTERN
 NSArray<id<MTLDevice>>* MTLCopyAllDevices(void) {
+	if (metalDisabledByEnvironment()) {
+		return [NSArray new];
+	}
 #if DARLING_METAL_ENABLED
 	ensureDevices();
 	return [devices copy];
