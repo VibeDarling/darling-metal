@@ -12,6 +12,9 @@
 #import <Metal/MTLRenderPipelineInternal.h>
 #import <Metal/MTLTextureDescriptorInternal.h>
 #import <Metal/MTLTextureInternal.h>
+#import <Metal/MTLSamplerDescriptorInternal.h>
+#import <Metal/MTLSamplerStateInternal.h>
+#import <Metal/MTLDepthStencilDescriptorInternal.h>
 
 MTL_EXTERN const MTLDeviceNotificationName MTLDeviceWasAddedNotification = @"MTLDeviceWasAdded";
 MTL_EXTERN const MTLDeviceNotificationName MTLDeviceRemovalRequestedNotification = @"MTLDeviceRemovalRequested";
@@ -217,6 +220,26 @@ void MTLRemoveDeviceObserver(id<NSObject> observer) {
 		return nil;
 	}
 	return [[MTLTextureInternal alloc] initWithTexture: texture device: self resourceOptions: descriptor.resourceOptions];
+}
+
+- (id<MTLSamplerState>)newSamplerStateWithDescriptor: (MTLSamplerDescriptor*)descriptor
+{
+	auto state = _device->newSamplerState([descriptor asIndiumDescriptor]);
+	if (!state) {
+		return nil;
+	}
+	MTLSamplerStateInternal* sampler = [[MTLSamplerStateInternal alloc] initWithState: state device: self];
+	sampler.label = descriptor.label;
+	return sampler;
+}
+
+- (id<MTLDepthStencilState>)newDepthStencilStateWithDescriptor: (MTLDepthStencilDescriptor*)descriptor
+{
+	auto state = _device->newDepthStencilState([descriptor asIndiumDescriptor]);
+	if (!state) {
+		return nil;
+	}
+	return [[MTLDepthStencilStateInternal alloc] initWithState: state device: self];
 }
 
 - (id<MTLCommandQueue>)newCommandQueue

@@ -41,6 +41,7 @@ add_framework(Metal
 
 	SOURCES
 		src/Metal/Metal.mm
+		src/Metal/MTLBlitCommandEncoder.mm
 		src/Metal/MTLBuffer.mm
 		src/Metal/MTLCaptureManager.mm
 		src/Metal/MTLCommandBuffer.mm
@@ -57,6 +58,7 @@ add_framework(Metal
 		src/Metal/MTLRenderCommandEncoder.mm
 		src/Metal/MTLRenderPipeline.mm
 		src/Metal/MTLSamplerDescriptor.mm
+		src/Metal/MTLSamplerState.mm
 		src/Metal/MTLStencilDescriptor.mm
 		src/Metal/MTLTexture.mm
 		src/Metal/MTLTextureDescriptor.mm
