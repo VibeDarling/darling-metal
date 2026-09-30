@@ -4,3 +4,6 @@
 [submodule "deps/indium"]
 	path = deps/indium
 	url = ../indium.git
+[submodule "deps/mslc"]
+	path = deps/mslc
+	url = https://github.com/cristim/mslc.git
