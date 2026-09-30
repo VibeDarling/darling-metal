@@ -20,6 +20,7 @@
 #include <mslc/mslc.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 MTL_EXTERN const MTLDeviceNotificationName MTLDeviceWasAddedNotification = @"MTLDeviceWasAdded";
 MTL_EXTERN const MTLDeviceNotificationName MTLDeviceRemovalRequestedNotification = @"MTLDeviceRemovalRequested";
