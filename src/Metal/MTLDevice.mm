@@ -34,6 +34,7 @@ static MTLDeviceInternal* systemDefaultDevice = nil;
 
 static void ensureDevices(void) {
 	dispatch_once(&devicesInitToken, ^{
+		ensureMetalInitialized();
 		devices = [NSMutableArray new];
 
 		// for now, we just have the system default device
@@ -447,6 +448,18 @@ void MTLRemoveDeviceObserver(id<NSObject> observer) {
 	}
 
 	return [[MTLLibraryInternal alloc] initWithLibrary: library device: self];
+}
+
+- (BOOL) isLowPower {
+	return NO;
+}
+
+- (BOOL) isHeadless {
+	return NO;
+}
+
+- (BOOL) isRemovable {
+	return NO;
 }
 
 #else

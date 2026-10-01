@@ -97,6 +97,10 @@ MTL_EXPORT void MTLRemoveDeviceObserver(id<NSObject> observer);
                                         options: (nullable MTLCompileOptions*)options
                                           error: (NSError**)error;
 
+@property (readonly, getter=isLowPower) BOOL lowPower;
+@property (readonly, getter=isHeadless) BOOL headless;
+@property (readonly, getter=isRemovable) BOOL removable;
+
 // TODO: other methods and properties
 
 @end
