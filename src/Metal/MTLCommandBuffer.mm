@@ -139,6 +139,11 @@ struct MTLCommandBufferHandlerWrapper {
 	_commandBuffer->presentDrawable(((id<MTLDrawableInternal>)drawable).drawable);
 }
 
+- (void)enqueue
+{
+	// Enqueue reserves a place on the command queue before commit
+}
+
 - (void)commit
 {
 	_commandBuffer->commit();

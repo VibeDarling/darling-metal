@@ -65,8 +65,18 @@ void MTLDeviceDestroyAll(void) {
 #endif
 
 static bool metalDisabledByEnvironment(void) {
-	const char* value = getenv("DARLING_METAL_DISABLE");
-	return value && value[0] != '\0' && value[0] != '0';
+	const char* disable = getenv("DARLING_METAL_DISABLE");
+	if (disable && disable[0] != '\0' && disable[0] != '0') {
+		return true;
+	}
+	const char* enable = getenv("DARLING_ENABLE_METAL");
+	if (enable && (enable[0] == '1' || enable[0] == 'y' || enable[0] == 'Y')) {
+		return false;
+	}
+	// By default, since Metal AIR translation and render pipelines are still under active development
+	// (e.g. advanced texture samplers in Iridium), keep Metal gated behind DARLING_ENABLE_METAL=1
+	// so SDL2 / OpenGL games automatically fall back to the mature OpenGL renderer.
+	return true;
 }
 
 MTL_EXTERN
@@ -228,15 +238,29 @@ void MTLRemoveDeviceObserver(id<NSObject> observer) {
 - (id<MTLRenderPipelineState>)newRenderPipelineStateWithDescriptor: (MTLRenderPipelineDescriptor*)descriptor
                                                              error: (NSError**)error
 {
-	auto pso = _device->newRenderPipelineState([descriptor asIndiumDescriptor]);
-	if (!pso) {
+	if (descriptor == nil || descriptor.vertexFunction == nil) {
 		if (error) {
-			// TODO: better error and/or match what the official Metal method does
-			*error = [NSError errorWithDomain: NSPOSIXErrorDomain code: ENOMEM userInfo: nil];
+			*error = [NSError errorWithDomain: MTLLibraryErrorDomain code: MTLLibraryErrorFunctionNotFound userInfo: nil];
 		}
 		return nil;
 	}
-	return [[MTLRenderPipelineStateInternal alloc] initWithState: pso device: self label: descriptor.label];
+	try {
+		auto pso = _device->newRenderPipelineState([descriptor asIndiumDescriptor]);
+		if (!pso) {
+			if (error) {
+				*error = [NSError errorWithDomain: MTLLibraryErrorDomain code: MTLLibraryErrorInternal userInfo: nil];
+			}
+			return nil;
+		}
+		return [[MTLRenderPipelineStateInternal alloc] initWithState: pso device: self label: descriptor.label];
+	} catch (const std::exception& e) {
+		if (error) {
+			*error = [NSError errorWithDomain: MTLLibraryErrorDomain code: MTLLibraryErrorInternal userInfo: @{
+				NSLocalizedDescriptionKey: [NSString stringWithUTF8String: e.what()]
+			}];
+		}
+		return nil;
+	}
 }
 
 - (id<MTLTexture>)newTextureWithDescriptor: (MTLTextureDescriptor*)descriptor
@@ -336,11 +360,29 @@ void MTLRemoveDeviceObserver(id<NSObject> observer) {
                                error: (NSError**)error
 {
 	NSData* nsdata = (NSData*)data;
-	auto lib = _device->newLibrary(nsdata.bytes, nsdata.length);
-	if (!lib) {
+	if (nsdata == nil || [nsdata length] == 0) {
+		if (error) {
+			*error = [NSError errorWithDomain: MTLLibraryErrorDomain code: MTLLibraryErrorCompileFailure userInfo: nil];
+		}
 		return nil;
 	}
-	return [[MTLLibraryInternal alloc] initWithLibrary: lib device: self];
+	try {
+		auto lib = _device->newLibrary(nsdata.bytes, nsdata.length);
+		if (!lib) {
+			if (error) {
+				*error = [NSError errorWithDomain: MTLLibraryErrorDomain code: MTLLibraryErrorCompileFailure userInfo: nil];
+			}
+			return nil;
+		}
+		return [[MTLLibraryInternal alloc] initWithLibrary: lib device: self];
+	} catch (const std::exception& e) {
+		if (error) {
+			*error = [NSError errorWithDomain: MTLLibraryErrorDomain code: MTLLibraryErrorCompileFailure userInfo: @{
+				NSLocalizedDescriptionKey: [NSString stringWithUTF8String: e.what()]
+			}];
+		}
+		return nil;
+	}
 }
 
 - (id<MTLLibrary>)newLibraryWithSource: (NSString*)source
