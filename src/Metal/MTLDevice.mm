@@ -336,4 +336,22 @@ MTL_UNSUPPORTED_CLASS
 
 #endif
 
+- (BOOL) supportsTextureSampleCount: (NSUInteger)count {
+	/* MSL only supports a single sample per pixel; no multisampling is implemented
+	 * here, so anything other than 1 is refused rather than silently wrong. */
+	return count == 1;
+}
+
+- (BOOL) isLowPower {
+	return NO;
+}
+
+- (BOOL) isHeadless {
+	return NO;
+}
+
+- (BOOL) isRemovable {
+	return NO;
+}
+
 @end
