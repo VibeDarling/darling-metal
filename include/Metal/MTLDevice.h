@@ -156,9 +156,7 @@ MTL_EXPORT void MTLRemoveDeviceObserver(id<NSObject> observer);
 /* Games query these before choosing a render path. Implemented as constants rather
  * than left to crash: a selector miss on MTLDevice takes the whole app down at
  * startup, which is how this was found. */
-@property (readonly, getter=isLowPower) BOOL lowPower;
-@property (readonly, getter=isHeadless) BOOL headless;
-@property (readonly, getter=isRemovable) BOOL removable;
+- (BOOL) supportsTextureSampleCount: (NSUInteger)count;
 
 @end
 

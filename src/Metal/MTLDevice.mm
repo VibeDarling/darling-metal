@@ -533,16 +533,4 @@ MTL_UNSUPPORTED_CLASS
 	return count == 1;
 }
 
-- (BOOL) isLowPower {
-	return NO;
-}
-
-- (BOOL) isHeadless {
-	return NO;
-}
-
-- (BOOL) isRemovable {
-	return NO;
-}
-
 @end
