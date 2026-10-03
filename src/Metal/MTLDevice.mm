@@ -521,6 +521,21 @@ void MTLRemoveDeviceObserver(id<NSObject> observer) {
 	return NO;
 }
 
+- (BOOL) supportsTextureSampleCount: (NSUInteger)count {
+	// Apple Silicon supports 1x, 2x, 4x and 8x MSAA. 16x and 32x are desktop-GPU
+	// capabilities that no Apple GPU has, so they are refused rather than passed
+	// to a render pass that would fail later in a less explicable place.
+	switch (count) {
+		case 1:
+		case 2:
+		case 4:
+		case 8:
+			return YES;
+		default:
+			return NO;
+	}
+}
+
 #else
 
 MTL_UNSUPPORTED_CLASS

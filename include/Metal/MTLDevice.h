@@ -151,6 +151,8 @@ MTL_EXPORT void MTLRemoveDeviceObserver(id<NSObject> observer);
 @property (readonly, getter=isHeadless) BOOL headless;
 @property (readonly, getter=isRemovable) BOOL removable;
 
+- (BOOL)supportsTextureSampleCount: (NSUInteger)count;
+
 // TODO: other methods and properties
 
 @end
