@@ -18,8 +18,8 @@ if (BUILD_METAL)
 	# and a corpus runner that fork/exec spirv-val, neither of which belongs in a
 	# guest address space with no host exec path, and mslc is a repository other
 	# people work on, so a target appearing there must not become a reason this
-	# one stops building. The library's source list comes from mslc's
-	# sources.cmake, so it always matches the pinned commit.
+	# one stops building. The library's sources and include directories come from
+	# mslc's sources.cmake, so they always match the pinned commit.
 	#
 	# The public surface is a C ABI declared in deps/mslc/include/mslc/mslc.h, which
 	# is what Metal.framework includes. No C++ of mslc's is visible past it.
@@ -31,12 +31,9 @@ if (BUILD_METAL)
 
 	install(TARGETS mslc DESTINATION libexec/darling/usr/lib/darling)
 
-	target_include_directories(mslc PUBLIC
-		deps/mslc/include
-	)
-
-	target_include_directories(mslc PRIVATE
-		deps/mslc/src
+	target_include_directories(mslc
+		PUBLIC ${MSLC_PUBLIC_INCLUDE_DIRS}
+		PRIVATE ${MSLC_PRIVATE_INCLUDE_DIRS}
 	)
 
 	set_target_properties(mslc PROPERTIES
