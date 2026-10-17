@@ -6,4 +6,4 @@
 	url = ../indium.git
 [submodule "deps/mslc"]
 	path = deps/mslc
-	url = ../mslc.git
+	url = https://github.com/cristim/mslc.git
